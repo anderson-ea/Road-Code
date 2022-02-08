@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav--container {
+  margin: 0;
+  width: 100%;
+  color: white;
+  font-weight: 700;
+  padding: 5px 20px;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  background-color: rgba(36, 98, 114, 0.637);
+}
+
+.nav--container > input {
+  height: 30px;
+}
+
+.nav--start {
+  margin-left: auto;
+}
+
+.nav--destination {
+  margin-right:20px;
+  margin-left: 10px;
+}
+
+.info--window {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+.info--window > h4 {
+  margin: 0;
+}
+
+.info--top {
+  display: flex;
+  align-content: center;
+  margin: 0;
+}
+
+.info--top > span {
+  margin-top: 16px;
+  margin-left: 5px;
+}
