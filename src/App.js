@@ -1,19 +1,24 @@
 import React, { useState } from 'react'
-import Navbar from './components/Navbar'
 import {
   GoogleMap,
   useLoadScript,
   Marker,
-  InfoWindow
+  InfoWindow,
 } from '@react-google-maps/api';
 import { nanoid } from "nanoid";
-// import usePlacesAutocomplete, {
-//   getGeocode,
-//   getLatLng,
-// } from 'use-places-autocomplete';
-// import {
-  
-// }
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from 'use-places-autocomplete';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+  ComboboxOptionText,
+} from "@reach/combobox";
+import "@reach/combobox/styles.css";
 
 const libraries = ["places"];
 
@@ -25,7 +30,8 @@ export default function App() {
   const [center, setCenter] = useState({
     lat: 39.7392, 
     lng: -104.9903
-  });  
+  }); 
+   
   
   function placeMarker(event) {
     const lat = event.latLng.lat()
@@ -49,7 +55,7 @@ export default function App() {
     /> 
     ))
 
-  // Script to load API key and libraries used in API
+  // Hook/Script to load API key and libraries used in API
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
@@ -100,16 +106,52 @@ export default function App() {
   );
 }
 
-// function Search() {
-//   const { 
-//     ready, 
-//     value, 
-//     suggestions: { status, data }, 
-//     setValue, 
-//     clearSuggestions
-//   } = usePlacesAutocomplete()
+function Navbar() {
 
-//   return (
-//     <input value={} onChange={}></input>
-//   )
-// };
+  const { 
+    ready, 
+    value, 
+    suggestions: { status, data }, 
+    setValue, 
+    clearSuggestions
+  } = usePlacesAutocomplete()
+
+  // Request options for denver area inside usePlacesAutocomplete param
+  // {
+  //   requestOptions: {
+  //     location: { lat: () => 39.7392, lng: () => -104.9903 },
+  //     radius: 100 * 1000
+  //   }
+  // }
+
+  function handleInput(event) {
+    setValue(event.target.value)
+  }
+
+  function handleSelect(address) {
+    console.log(address)
+  }
+
+  return (
+    <nav className='nav--container'>
+      <h2>Road Code</h2>
+      <div className='nav--start'>
+        <Combobox onSelect={handleSelect}>
+          <ComboboxInput 
+            value={value} 
+            onChange={handleInput} 
+            placeholder="search"
+            disabled={!ready}
+          >
+          </ComboboxInput>
+          <ComboboxPopover>
+            {status === "OK" && 
+              data.map(({ id, description }) => (
+                <ComboboxOption key={nanoid()} value={description} />
+                ))}
+          </ComboboxPopover>
+        </Combobox>
+      </div>
+    </nav>
+  )
+}
