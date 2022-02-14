@@ -24,10 +24,6 @@ body {
   background-color: rgba(36, 98, 114, 0.637);
 }
 
-.nav--container > input {
-  height: 30px;
-}
-
 .nav--start {
   margin-left: auto;
 }
