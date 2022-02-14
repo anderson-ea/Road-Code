@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import {
   GoogleMap,
   useLoadScript,
@@ -14,9 +14,7 @@ import {
   Combobox,
   ComboboxInput,
   ComboboxPopover,
-  ComboboxList,
   ComboboxOption,
-  ComboboxOptionText,
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
 
@@ -27,12 +25,17 @@ export default function App() {
   const weatherAPIKey = process.env.REACT_APP_WEATHER_API_KEY
   const [markers, setMarkers] = useState([])
   const [selectedMarker, setSelectedMarker] = useState(null)
+  const mapRef = useRef()
+  const onMapLoad = useCallback((map) => {
+    mapRef.current = map;
+  }, []);
+ 
   const [center, setCenter] = useState({
     lat: 39.7392, 
     lng: -104.9903
   }); 
-   
   
+  // Places markers on map and fetches weather data based on marker lat/lng
   function placeMarker(event) {
     const lat = event.latLng.lat()
     const lon = event.latLng.lng()
@@ -46,6 +49,12 @@ export default function App() {
         data: data
       }]))
   }
+
+  // Pan to selected location
+  const panTo = useCallback(({ lat, lng }) => {
+    mapRef.current.panTo({ lat, lng });
+    mapRef.current.setZoom(11);
+  }, []);
 
   const theseAreMarkers = markers.map(marker => (
     <Marker
@@ -77,14 +86,15 @@ export default function App() {
 
   return (
     <div className="container">
-      <Navbar />
+      <Navbar panTo={panTo} />
       <GoogleMap
-        name="map"
-        zoom={5}
+        id="map"
+        zoom={7}
         mapContainerStyle={mapContainerStyle}
         center={center}
         options={options}
         onClick={placeMarker}
+        onLoad={onMapLoad}
       >
         {theseAreMarkers}
         {selectedMarker === null ? 
@@ -106,7 +116,7 @@ export default function App() {
   );
 }
 
-function Navbar() {
+function Navbar({ panTo }) {
 
   const { 
     ready, 
@@ -116,25 +126,26 @@ function Navbar() {
     clearSuggestions
   } = usePlacesAutocomplete()
 
-  // Request options for denver area inside usePlacesAutocomplete param
-  // {
-  //   requestOptions: {
-  //     location: { lat: () => 39.7392, lng: () => -104.9903 },
-  //     radius: 100 * 1000
-  //   }
-  // }
-
   function handleInput(event) {
     setValue(event.target.value)
   }
 
-  function handleSelect(address) {
-    console.log(address)
+  async function handleSelect(address) {
+    setValue(address, false)
+    clearSuggestions()
+
+    try {
+      const results = await getGeocode({ address })
+      const { lat, lng } = await getLatLng(results[0])
+      panTo({ lat, lng })
+    } catch(error) {
+      alert(error)
+    }
   }
 
   return (
     <nav className='nav--container'>
-      <h2>Road Code</h2>
+      <h2>Weather Where</h2>
       <div className='nav--start'>
         <Combobox onSelect={handleSelect}>
           <ComboboxInput 
@@ -147,7 +158,7 @@ function Navbar() {
           <ComboboxPopover>
             {status === "OK" && 
               data.map(({ id, description }) => (
-                <ComboboxOption key={nanoid()} value={description} />
+                <ComboboxOption key={id} value={description} />
                 ))}
           </ComboboxPopover>
         </Combobox>
