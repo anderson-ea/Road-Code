@@ -1,5 +1,5 @@
 # Weather Where
-Interactive map where you can type in any location or click on the map to find out the weather. Consumes Google Maps API as well as Open Weather Map API.
+Interactive map where you can type in any location or click on the map to find out the weather. I did this project mainly to just show and practice consuming APIs and using two different ones in conjuction with eachother. Consumes Google Maps API as well as Open Weather Map API.
 
 ## Geocoding
 Geocoding accomplished using Google Places API allows for autocomplete functionality when searching for a location. </br></br>
